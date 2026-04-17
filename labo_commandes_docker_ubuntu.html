@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Labo-lecture — Commandes Docker essentielles sous Ubuntu</title>
+<link href="style.css" rel="stylesheet"/>
+<link href="style_print.css" media="print" rel="stylesheet"/>
+<link href="unified_style.css" rel="stylesheet"/>
+<script defer="" src="script.js"></script>
+<script defer="" src="unified_script.js"></script>
+</head>
+<body id="top">
+<a aria-label="Retour en haut" class="back-to-top" href="#top">↑</a>
+<main class="document">
+<header class="document-header">
+<section aria-label="En-tête du cours" class="course-banner">
+<div class="banner-left">
+<div class="banner-photo-wrap">
+<img alt="Anis Ghaieb" class="banner-photo" src="img/anis.png"/>
+</div>
+<div class="banner-left-info">
+<p class="banner-name">Anis Ghaieb</p>
+<p class="banner-email">baniss2002@gmail.com</p>
+</div>
+</div>
+<div class="banner-center">
+<p class="banner-course">
+<span class="banner-course-line">AUTOMATISATION ET CONTENEURS</span>
+<span class="banner-course-line">COMMANDES DOCKER ESSENTIELLES SOUS UBUNTU</span>
+</p>
+</div>
+<div class="banner-right">
+<img alt="Collège Universel" class="banner-logo" src="img/college.png"/>
+<p class="banner-college">
+<span class="banner-college-main">Collège Universel</span>
+<span class="banner-college-sub">Campus Montréal</span>
+</p>
+</div>
+</section>
+
+<section aria-label="Équipe" class="team-panel">
+<div class="team-panel-head"><h2 class="team-panel-title">Équipe</h2></div>
+<div class="team-grid">
+<label class="team-field" for="teamMember1"><span class="team-label">Nom1 :</span><input autocomplete="off" class="team-member-input" id="teamMember1" placeholder="Nom de l’étudiant 1" type="text"/></label>
+<label class="team-field" for="teamMember2"><span class="team-label">Nom2 :</span><input autocomplete="off" class="team-member-input" id="teamMember2" placeholder="Nom de l’étudiant 2" type="text"/></label>
+<label class="team-field" for="teamMember3"><span class="team-label">Nom3 :</span><input autocomplete="off" class="team-member-input" id="teamMember3" placeholder="Nom de l’étudiant 3" type="text"/></label>
+<label class="team-field" for="teamMember4"><span class="team-label">Nom4 :</span><input autocomplete="off" class="team-member-input" id="teamMember4" placeholder="Nom de l’étudiant 4" type="text"/></label>
+</div>
+</section>
+
+<div aria-hidden="true" class="team-print-card" id="teamPrint"></div>
+
+<div class="document-hero">
+<figure class="content-figure hero-figure">
+<img alt="Illustration du chapitre" class="content-image hero-image" src="img/chap.png"/>
+</figure>
+<p class="document-kicker">docker — labo guidé</p>
+<h1 class="document-title">Labo : commandes Docker essentielles sous Ubuntu — exécution, interaction, cycle de vie, inspection et monitoring</h1>
+<p class="document-intro">
+Dans ce labo, vous allez d’abord vérifier votre environnement Ubuntu, lancer un conteneur Nginx, interagir avec lui et observer plusieurs commandes Docker utiles pour son cycle de vie, son inspection et son monitoring. Ensuite, vous préparerez une petite application Python de <strong>health check</strong>, vous la ferez fonctionner localement avec <strong>venv</strong> et <strong>pip</strong>, puis vous la conteneuriserez avec Docker. Enfin, vous récupérerez le fichier <strong>report.txt</strong> sur votre machine Ubuntu à l’aide d’un volume.
+</p>
+</div>
+
+<section aria-label="Vue d’ensemble du labo" class="document-overview">
+<div class="overview-panel">
+<h2 class="overview-title">table des matières</h2>
+<nav aria-label="Table des matières du labo" class="toc-nav">
+<ul class="toc-list">
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-1">Partie 1 — Préparation et vérification des prérequis</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-2">Partie 2 — Lancer un conteneur Nginx et interagir avec lui</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-3">Partie 3 — Observer le cycle de vie, l’inspection et le monitoring</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-4">Partie 4 — Préparer et tester localement l’application Python</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-5">Partie 5 — Construire l’image Docker de l’application</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-6">Partie 6 — Récupérer le rapport sur la machine Ubuntu</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-7">Partie 7 — Bilan final et nettoyage</a></li>
+<li class="toc-item toc-level-1"><a class="toc-link" href="#partie-qcm">QCM de validation</a></li>
+<li class="toc-item toc-level-1 toc-item-export"><a class="toc-link" href="#export">Exportation en PDF</a></li>
+</ul>
+</nav>
+</div>
+<div class="overview-panel">
+<h2 class="overview-title">objectifs du labo</h2>
+<ul class="goal-list">
+<li>Utiliser les commandes Docker essentielles sur Ubuntu pour lancer, observer et arrêter un conteneur.</li>
+<li>Interagir avec un conteneur à l’aide de <strong>docker exec</strong> et consulter ses journaux avec <strong>docker logs</strong>.</li>
+<li>Comprendre plusieurs états d’un conteneur : <strong>pause</strong>, <strong>unpause</strong>, <strong>restart</strong>, <strong>stop</strong> et <strong>start</strong>.</li>
+<li>Inspecter et surveiller un conteneur avec <strong>inspect</strong>, <strong>stats</strong>, <strong>diff</strong> et <strong>system df</strong>.</li>
+<li>Construire une image Docker simple à partir d’un script Python et d’un <strong>Dockerfile</strong>.</li>
+<li>Utiliser un volume Docker pour récupérer un fichier généré dans un conteneur sur la machine Ubuntu.</li>
+</ul>
+</div>
+</section>
+</header>
+
+
+<section class="part" id="partie-1">
+  <div class="part-header"><h2 class="part-title">Partie 1 — Préparation et vérification des prérequis</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p1-s1">Vérifier Python, venv et Docker</h3>
+      <div class="section-body">
+        <p>Avant de manipuler des conteneurs, vous devez confirmer que votre machine Ubuntu possède bien les outils nécessaires. Cette vérification évite de perdre du temps plus tard sur un simple problème d’installation ou de permission.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — vérification des prérequis</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-prereq" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-prereq">
+        <div class="line" data-copy="python3 --version" data-help-title="Vérifier Python" data-help="Cette commande confirme que Python 3 est bien disponible dans la VM." tabindex="0"><span class="line-no">1</span><span class="line-text">python3 --version</span></div><div class="line" data-copy="python3 -m pip --version"><span class="line-no">2</span><span class="line-text">python3 -m pip --version</span></div><div class="line" data-copy="python3 -m venv --help" data-help-title="Vérifier venv" data-help="Cette commande confirme que le module de création d’environnements virtuels est présent." tabindex="0"><span class="line-no">3</span><span class="line-text">python3 -m venv --help</span></div><div class="line" data-copy="docker --version"><span class="line-no">4</span><span class="line-text">docker --version</span></div><div class="line" data-copy="docker ps" data-help-title="Vérifier Docker" data-help="Cette commande teste l’accès au moteur Docker et permet aussi de repérer un éventuel problème de permission." tabindex="0"><span class="line-no">5</span><span class="line-text">docker ps</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="callout spaced-block"><strong>Bon réflexe :</strong> si <code>docker ps</code> affiche une erreur de permission, utilisez temporairement <code>sudo docker ps</code> puis corrigez ensuite le groupe Docker si l’enseignant vous l’a demandé.</div>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+Python 3.12.x
+pip 24.x depuis .../site-packages/pip
+usage: ... python -m venv [options]
+Docker version 26.x, build ...
+CONTAINER ID   IMAGE   COMMAND   CREATED   STATUS   PORTS   NAMES</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p1-proof">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez la sortie de <strong>python3 --version</strong>, de <strong>docker --version</strong> et de <strong>docker ps</strong> sans message d’erreur bloquant.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+        <div class="callout spaced-block">
+  <strong>À saisir :</strong> à quoi sert cette vérification des prérequis avant de commencer le vrai travail Docker ?
+  <div class="answer-area">
+    <textarea class="team-input answerbox-large" id="p1-answer" placeholder="Écris ici ta réponse..."></textarea>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-2">
+  <div class="part-header"><h2 class="part-title">Partie 2 — Lancer un conteneur Nginx et interagir avec lui</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p2-s1">Télécharger puis démarrer un service web simple</h3>
+      <div class="section-body">
+        <p>Cette première manipulation sert à observer un conteneur déjà prêt à l’emploi. Nginx est pratique pour débuter : l’image se télécharge vite, le démarrage est immédiat et le résultat est facile à vérifier.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — lancer Nginx</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-run-nginx" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-run-nginx">
+        <div class="line" data-copy="sudo docker pull nginx" data-help-title="Télécharger l’image" data-help="Cette commande récupère l’image officielle Nginx depuis le registre Docker." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker pull nginx</span></div><div class="line" data-copy="sudo docker run -d --name web1 -p 8080:80 nginx" data-help-title="Créer le conteneur" data-help="Cette commande lance un conteneur nommé web1 en arrière-plan et publie le port 80 du conteneur sur le port 8080 de la machine Ubuntu." tabindex="0"><span class="line-no">2</span><span class="line-text">sudo docker run -d --name web1 -p 8080:80 nginx</span></div><div class="line" data-copy="sudo docker ps" data-help-title="Vérifier l’exécution" data-help="Cette commande doit montrer que web1 est en état Up." tabindex="0"><span class="line-no">3</span><span class="line-text">sudo docker ps</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — vérifier le service web</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-check-nginx" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-check-nginx">
+        <div class="line" data-copy="curl -I http://localhost:8080" data-help-title="Tester localement" data-help="Cette commande vérifie que le service HTTP répond sur la machine Ubuntu." tabindex="0"><span class="line-no">1</span><span class="line-text">curl -I http://localhost:8080</span></div><div class="line" data-copy="sudo docker port web1" data-help-title="Vérifier la publication du port" data-help="Cette commande montre le lien entre le port du conteneur et celui de la machine hôte." tabindex="0"><span class="line-no">2</span><span class="line-text">sudo docker port web1</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+Status: Downloaded newer image for nginx:latest
+&lt;id_du_conteneur&gt;
+HTTP/1.1 200 OK
+...
+80/tcp -&gt; 0.0.0.0:8080</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p2-proof-run">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez que le conteneur <strong>web1</strong> est en état <strong>Up</strong> et qu’une vérification HTTP sur <strong>localhost:8080</strong> répond correctement.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+      </div>
+    </section>
+
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p2-s2">Exécuter des commandes dans le conteneur et lire ses journaux</h3>
+      <div class="section-body">
+        <p>Un conteneur n’est pas une boîte noire. Vous pouvez lui envoyer des commandes ponctuelles, consulter certains fichiers internes et lire ses journaux pour comprendre ce qu’il fait.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — interagir avec le conteneur</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-interact-nginx" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-interact-nginx">
+        <div class="line" data-copy="sudo docker exec web1 sh -c &quot;nginx -v 2&gt;&amp;1&quot;" data-help-title="Exécuter une commande dans le conteneur" data-help="docker exec permet d’entrer en interaction avec le conteneur sans ouvrir une session graphique." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker exec web1 sh -c &quot;nginx -v 2&gt;&amp;1&quot;</span></div><div class="line" data-copy="sudo docker exec web1 sh -c &quot;ls -1 /usr/share/nginx/html&quot;"><span class="line-no">2</span><span class="line-text">sudo docker exec web1 sh -c &quot;ls -1 /usr/share/nginx/html&quot;</span></div><div class="line" data-copy="sudo docker exec web1 sh -c &quot;echo test-interne &gt; /tmp/labo-docker.txt&quot;" data-help-title="Préparer un changement visible" data-help="Ce fichier temporaire permettra ensuite à docker diff de montrer qu’un changement interne a été effectué." tabindex="0"><span class="line-no">3</span><span class="line-text">sudo docker exec web1 sh -c &quot;echo test-interne &gt; /tmp/labo-docker.txt&quot;</span></div><div class="line" data-copy="sudo docker logs web1" data-help-title="Consulter les journaux" data-help="docker logs affiche la sortie standard du conteneur." tabindex="0"><span class="line-no">4</span><span class="line-text">sudo docker logs web1</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+nginx version: nginx/1.27.x
+index.html
+50x.html
+...
+GET / HTTP/1.1 ...</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p2-proof-interact">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez une commande <strong>docker exec</strong> réussie et une sortie de <strong>docker logs web1</strong> ou la création du fichier <strong>/tmp/labo-docker.txt</strong>.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+        <div class="callout spaced-block">
+  <strong>À saisir :</strong> en une ou deux phrases, expliquez ce que permet <code>docker exec</code> dans ce labo.
+  <div class="answer-area">
+    <textarea class="team-input answerbox-large" id="p2-answer" placeholder="Écris ici ta réponse..."></textarea>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-3">
+  <div class="part-header"><h2 class="part-title">Partie 3 — Observer le cycle de vie, l’inspection et le monitoring</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p3-s1">Tester les états d’un conteneur</h3>
+      <div class="section-body">
+        <p>Dans cette partie, vous allez manipuler plusieurs états possibles du même conteneur : pause, reprise, redémarrage, arrêt et démarrage. Le but est de comprendre qu’un conteneur déjà créé peut vivre plusieurs transitions sans être reconstruit.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — cycle de vie du conteneur</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-lifecycle" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-lifecycle">
+        <div class="line" data-copy="sudo docker pause web1" data-help-title="Mettre en pause" data-help="Le processus du conteneur est suspendu sans être supprimé." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker pause web1</span></div><div class="line" data-copy="sudo docker unpause web1"><span class="line-no">2</span><span class="line-text">sudo docker unpause web1</span></div><div class="line" data-copy="sudo docker restart web1"><span class="line-no">3</span><span class="line-text">sudo docker restart web1</span></div><div class="line" data-copy="sudo docker stop web1" data-help-title="Arrêter" data-help="Le conteneur s’arrête complètement mais il existe encore." tabindex="0"><span class="line-no">4</span><span class="line-text">sudo docker stop web1</span></div><div class="line" data-copy="sudo docker start web1" data-help-title="Redémarrer proprement" data-help="Le conteneur déjà créé repart sans qu’il soit nécessaire de le recréer." tabindex="0"><span class="line-no">5</span><span class="line-text">sudo docker start web1</span></div><div class="line" data-copy="sudo docker ps -a"><span class="line-no">6</span><span class="line-text">sudo docker ps -a</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="callout spaced-block"><strong>Rappel :</strong> <code>pause</code> suspend le processus ; <code>stop</code> l’arrête ; <code>start</code> relance un conteneur déjà existant.</div>
+      </div>
+    </section>
+
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p3-s2">Inspecter le conteneur et surveiller quelques indicateurs</h3>
+      <div class="section-body">
+        <p>Un administrateur ne se contente pas de lancer un conteneur. Il doit aussi être capable de lire son état, de repérer les ports, de voir l’usage des ressources et d’identifier les changements internes réalisés depuis le démarrage.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — inspection et monitoring</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-inspect" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-inspect">
+        <div class="line" data-copy="sudo docker inspect -f &#x27;{{.Name}} | {{.State.Status}} | {{range $p, $c := .NetworkSettings.Ports}}{{$p}} {{end}}&#x27; web1" data-help-title="Inspecter des informations ciblées" data-help="Cette commande extrait le nom, l’état et les ports publiés sans afficher tout le JSON complet." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker inspect -f &#x27;{{.Name}} | {{.State.Status}} | {{range $p, $c := .NetworkSettings.Ports}}{{$p}} {{end}}&#x27; web1</span></div><div class="line" data-copy="sudo docker stats web1 --no-stream" data-help-title="Observer l’usage en direct" data-help="docker stats --no-stream affiche un instantané de consommation CPU et mémoire." tabindex="0"><span class="line-no">2</span><span class="line-text">sudo docker stats web1 --no-stream</span></div><div class="line" data-copy="sudo docker diff web1" data-help-title="Voir les changements internes" data-help="docker diff montre les fichiers ajoutés, modifiés ou supprimés dans le conteneur depuis son démarrage." tabindex="0"><span class="line-no">3</span><span class="line-text">sudo docker diff web1</span></div><div class="line" data-copy="sudo docker system df"><span class="line-no">4</span><span class="line-text">sudo docker system df</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+/web1 | running | 80/tcp
+CONTAINER ID   NAME   CPU %   MEM USAGE / LIMIT   MEM %
+A /tmp/labo-docker.txt
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p3-proof">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez au minimum une sortie de <strong>docker inspect</strong>, une sortie de <strong>docker stats --no-stream</strong> et une sortie de <strong>docker diff web1</strong>.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+        <div class="callout spaced-block">
+  <strong>À saisir :</strong> quelle différence faites-vous entre <code>docker logs</code>, <code>docker inspect</code> et <code>docker stats</code> ?
+  <div class="answer-area">
+    <textarea class="team-input answerbox-large" id="p3-answer" placeholder="Écris ici ta réponse..."></textarea>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-4">
+  <div class="part-header"><h2 class="part-title">Partie 4 — Préparer et tester localement l’application Python</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p4-s1">Créer un dossier de projet propre puis écrire le script</h3>
+      <div class="section-body">
+        <p>Le projet de cette seconde moitié du labo est un mini outil de <em>health check</em>. Il teste une URL, mesure le temps de réponse, affiche un verdict simple et écrit un rapport texte dans <strong>report.txt</strong>.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — préparer le dossier de travail</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-workspace" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~$</div>
+      <div class="code-content" id="linux-workspace">
+        <div class="line" data-copy="mkdir -p ~/docker-labo-healthcheck" data-help-title="Créer un dossier sûr" data-help="Tout le travail Python et Docker sera concentré dans un seul dossier pour éviter les erreurs de chemin." tabindex="0"><span class="line-no">1</span><span class="line-text">mkdir -p ~/docker-labo-healthcheck</span></div><div class="line" data-copy="cd ~/docker-labo-healthcheck" data-help-title="Se placer dans le projet" data-help="Toutes les commandes suivantes doivent être lancées depuis ce dossier." tabindex="0"><span class="line-no">2</span><span class="line-text">cd ~/docker-labo-healthcheck</span></div><div class="line" data-copy="pwd"><span class="line-no">3</span><span class="line-text">pwd</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="code-or-file">
+          <span class="file-label">Contenu à enregistrer dans <strong>app.py</strong></span>
+          <section class="snippet-embed">
+  <section class="code-window theme-python">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">app.py</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="py-app" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      
+      <div class="code-content" id="py-app">
+        <div class="line" data-copy="import argparse"><span class="line-no">1</span><span class="line-text">import argparse</span></div><div class="line" data-copy="import time"><span class="line-no">2</span><span class="line-text">import time</span></div><div class="line" data-copy="from datetime import datetime"><span class="line-no">3</span><span class="line-text">from datetime import datetime</span></div><div class="line" data-copy=""><span class="line-no">4</span><span class="line-text"></span></div><div class="line" data-copy="import requests"><span class="line-no">5</span><span class="line-text">import requests</span></div><div class="line" data-copy=""><span class="line-no">6</span><span class="line-text"></span></div><div class="line" data-copy=""><span class="line-no">7</span><span class="line-text"></span></div><div class="line" data-copy="def check_url(url: str, timeout: int) -&gt; dict:" data-help-title="Tester l’URL" data-help="La fonction check_url envoie une requête HTTP et mesure le temps de réponse." tabindex="0"><span class="line-no">8</span><span class="line-text">def check_url(url: str, timeout: int) -&gt; dict:</span></div><div class="line" data-copy="    start = time.perf_counter()"><span class="line-no">9</span><span class="line-text">    start = time.perf_counter()</span></div><div class="line" data-copy="    try:"><span class="line-no">10</span><span class="line-text">    try:</span></div><div class="line" data-copy="        response = requests.get(url, timeout=timeout)"><span class="line-no">11</span><span class="line-text">        response = requests.get(url, timeout=timeout)</span></div><div class="line" data-copy="        elapsed_ms = (time.perf_counter() - start) * 1000"><span class="line-no">12</span><span class="line-text">        elapsed_ms = (time.perf_counter() - start) * 1000</span></div><div class="line" data-copy="        status = response.status_code"><span class="line-no">13</span><span class="line-text">        status = response.status_code</span></div><div class="line" data-copy="        ok = 200 &lt;= status &lt; 400"><span class="line-no">14</span><span class="line-text">        ok = 200 &lt;= status &lt; 400</span></div><div class="line" data-copy="        verdict = &quot;OK&quot; if ok and elapsed_ms &lt; 1000 else (&quot;lent&quot; if ok else &quot;erreur&quot;)"><span class="line-no">15</span><span class="line-text">        verdict = &quot;OK&quot; if ok and elapsed_ms &lt; 1000 else (&quot;lent&quot; if ok else &quot;erreur&quot;)</span></div><div class="line" data-copy="        return {"><span class="line-no">16</span><span class="line-text">        return {</span></div><div class="line" data-copy="            &quot;url&quot;: url,"><span class="line-no">17</span><span class="line-text">            &quot;url&quot;: url,</span></div><div class="line" data-copy="            &quot;status&quot;: status,"><span class="line-no">18</span><span class="line-text">            &quot;status&quot;: status,</span></div><div class="line" data-copy="            &quot;elapsed_ms&quot;: round(elapsed_ms, 1),"><span class="line-no">19</span><span class="line-text">            &quot;elapsed_ms&quot;: round(elapsed_ms, 1),</span></div><div class="line" data-copy="            &quot;verdict&quot;: verdict,"><span class="line-no">20</span><span class="line-text">            &quot;verdict&quot;: verdict,</span></div><div class="line" data-copy="            &quot;error&quot;: &quot;&quot;,"><span class="line-no">21</span><span class="line-text">            &quot;error&quot;: &quot;&quot;,</span></div><div class="line" data-copy="        }"><span class="line-no">22</span><span class="line-text">        }</span></div><div class="line" data-copy="    except requests.exceptions.RequestException as exc:"><span class="line-no">23</span><span class="line-text">    except requests.exceptions.RequestException as exc:</span></div><div class="line" data-copy="        elapsed_ms = (time.perf_counter() - start) * 1000"><span class="line-no">24</span><span class="line-text">        elapsed_ms = (time.perf_counter() - start) * 1000</span></div><div class="line" data-copy="        return {"><span class="line-no">25</span><span class="line-text">        return {</span></div><div class="line" data-copy="            &quot;url&quot;: url,"><span class="line-no">26</span><span class="line-text">            &quot;url&quot;: url,</span></div><div class="line" data-copy="            &quot;status&quot;: None,"><span class="line-no">27</span><span class="line-text">            &quot;status&quot;: None,</span></div><div class="line" data-copy="            &quot;elapsed_ms&quot;: round(elapsed_ms, 1),"><span class="line-no">28</span><span class="line-text">            &quot;elapsed_ms&quot;: round(elapsed_ms, 1),</span></div><div class="line" data-copy="            &quot;verdict&quot;: &quot;erreur&quot;,"><span class="line-no">29</span><span class="line-text">            &quot;verdict&quot;: &quot;erreur&quot;,</span></div><div class="line" data-copy="            &quot;error&quot;: str(exc),"><span class="line-no">30</span><span class="line-text">            &quot;error&quot;: str(exc),</span></div><div class="line" data-copy="        }" data-help-title="Écrire le rapport" data-help="save_report crée un fichier texte exploitable hors de Python." tabindex="0"><span class="line-no">31</span><span class="line-text">        }</span></div><div class="line" data-copy=""><span class="line-no">32</span><span class="line-text"></span></div><div class="line" data-copy=""><span class="line-no">33</span><span class="line-text"></span></div><div class="line" data-copy="def save_report(result: dict, filename: str) -&gt; None:"><span class="line-no">34</span><span class="line-text">def save_report(result: dict, filename: str) -&gt; None:</span></div><div class="line" data-copy="    now = datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)"><span class="line-no">35</span><span class="line-text">    now = datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)</span></div><div class="line" data-copy="    lines = ["><span class="line-no">36</span><span class="line-text">    lines = [</span></div><div class="line" data-copy="        f&quot;date: {now}&quot;,"><span class="line-no">37</span><span class="line-text">        f&quot;date: {now}&quot;,</span></div><div class="line" data-copy="        f&quot;url: {result[&#x27;url&#x27;]}&quot;,"><span class="line-no">38</span><span class="line-text">        f&quot;url: {result[&#x27;url&#x27;]}&quot;,</span></div><div class="line" data-copy="        f&quot;status: {result[&#x27;status&#x27;]}&quot;,"><span class="line-no">39</span><span class="line-text">        f&quot;status: {result[&#x27;status&#x27;]}&quot;,</span></div><div class="line" data-copy="        f&quot;temps_ms: {result[&#x27;elapsed_ms&#x27;]}&quot;,"><span class="line-no">40</span><span class="line-text">        f&quot;temps_ms: {result[&#x27;elapsed_ms&#x27;]}&quot;,</span></div><div class="line" data-copy="        f&quot;verdict: {result[&#x27;verdict&#x27;]}&quot;,"><span class="line-no">41</span><span class="line-text">        f&quot;verdict: {result[&#x27;verdict&#x27;]}&quot;,</span></div><div class="line" data-copy="    ]"><span class="line-no">42</span><span class="line-text">    ]</span></div><div class="line" data-copy="    if result[&quot;error&quot;]:" data-help-title="Parser les arguments" data-help="L’application peut recevoir une URL, un timeout et un nom de fichier de sortie." tabindex="0"><span class="line-no">43</span><span class="line-text">    if result[&quot;error&quot;]:</span></div><div class="line" data-copy="        lines.append(f&quot;erreur: {result[&#x27;error&#x27;]}&quot;)"><span class="line-no">44</span><span class="line-text">        lines.append(f&quot;erreur: {result[&#x27;error&#x27;]}&quot;)</span></div><div class="line" data-copy=""><span class="line-no">45</span><span class="line-text"></span></div><div class="line" data-copy="    with open(filename, &quot;w&quot;, encoding=&quot;utf-8&quot;) as file:"><span class="line-no">46</span><span class="line-text">    with open(filename, &quot;w&quot;, encoding=&quot;utf-8&quot;) as file:</span></div><div class="line" data-copy="        file.write(&quot;\n&quot;.join(lines) + &quot;\n&quot;)"><span class="line-no">47</span><span class="line-text">        file.write(&quot;\n&quot;.join(lines) + &quot;\n&quot;)</span></div><div class="line" data-copy=""><span class="line-no">48</span><span class="line-text"></span></div><div class="line" data-copy=""><span class="line-no">49</span><span class="line-text"></span></div><div class="line" data-copy="def main() -&gt; None:"><span class="line-no">50</span><span class="line-text">def main() -&gt; None:</span></div><div class="line" data-copy="    parser = argparse.ArgumentParser(description=&quot;Mini health check d&#x27;une URL&quot;)"><span class="line-no">51</span><span class="line-text">    parser = argparse.ArgumentParser(description=&quot;Mini health check d&#x27;une URL&quot;)</span></div><div class="line" data-copy="    parser.add_argument(&quot;--url&quot;, default=&quot;https://example.com&quot;, help=&quot;URL à tester&quot;)"><span class="line-no">52</span><span class="line-text">    parser.add_argument(&quot;--url&quot;, default=&quot;https://example.com&quot;, help=&quot;URL à tester&quot;)</span></div><div class="line" data-copy="    parser.add_argument(&quot;--timeout&quot;, type=int, default=5, help=&quot;Timeout en secondes&quot;)"><span class="line-no">53</span><span class="line-text">    parser.add_argument(&quot;--timeout&quot;, type=int, default=5, help=&quot;Timeout en secondes&quot;)</span></div><div class="line" data-copy="    parser.add_argument(&quot;--out&quot;, default=&quot;report.txt&quot;, help=&quot;Nom du rapport&quot;)"><span class="line-no">54</span><span class="line-text">    parser.add_argument(&quot;--out&quot;, default=&quot;report.txt&quot;, help=&quot;Nom du rapport&quot;)</span></div><div class="line" data-copy="    args = parser.parse_args()"><span class="line-no">55</span><span class="line-text">    args = parser.parse_args()</span></div><div class="line" data-copy=""><span class="line-no">56</span><span class="line-text"></span></div><div class="line" data-copy="    result = check_url(args.url, args.timeout)"><span class="line-no">57</span><span class="line-text">    result = check_url(args.url, args.timeout)</span></div><div class="line" data-copy=""><span class="line-no">58</span><span class="line-text"></span></div><div class="line" data-copy="    print(&quot;url:&quot;, result[&quot;url&quot;])"><span class="line-no">59</span><span class="line-text">    print(&quot;url:&quot;, result[&quot;url&quot;])</span></div><div class="line" data-copy="    print(&quot;status:&quot;, result[&quot;status&quot;])"><span class="line-no">60</span><span class="line-text">    print(&quot;status:&quot;, result[&quot;status&quot;])</span></div><div class="line" data-copy="    print(&quot;temps_ms:&quot;, result[&quot;elapsed_ms&quot;])"><span class="line-no">61</span><span class="line-text">    print(&quot;temps_ms:&quot;, result[&quot;elapsed_ms&quot;])</span></div><div class="line" data-copy="    print(&quot;verdict:&quot;, result[&quot;verdict&quot;])"><span class="line-no">62</span><span class="line-text">    print(&quot;verdict:&quot;, result[&quot;verdict&quot;])</span></div><div class="line" data-copy="    if result[&quot;error&quot;]:"><span class="line-no">63</span><span class="line-text">    if result[&quot;error&quot;]:</span></div><div class="line" data-copy="        print(&quot;erreur:&quot;, result[&quot;error&quot;])"><span class="line-no">64</span><span class="line-text">        print(&quot;erreur:&quot;, result[&quot;error&quot;])</span></div><div class="line" data-copy=""><span class="line-no">65</span><span class="line-text"></span></div><div class="line" data-copy="    save_report(result, args.out)"><span class="line-no">66</span><span class="line-text">    save_report(result, args.out)</span></div><div class="line" data-copy="    print(&quot;rapport:&quot;, args.out)"><span class="line-no">67</span><span class="line-text">    print(&quot;rapport:&quot;, args.out)</span></div><div class="line" data-copy=""><span class="line-no">68</span><span class="line-text"></span></div><div class="line" data-copy=""><span class="line-no">69</span><span class="line-text"></span></div><div class="line" data-copy="if __name__ == &quot;__main__&quot;:"><span class="line-no">70</span><span class="line-text">if __name__ == &quot;__main__&quot;:</span></div><div class="line" data-copy="    main()"><span class="line-no">71</span><span class="line-text">    main()</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        </div>
+        <div class="callout spaced-block"><strong>Point important :</strong> le premier test doit être lancé <strong>hors venv</strong>. C’est ce qui permet d’observer l’erreur attendue liée à la dépendance <code>requests</code>.</div>
+      </div>
+    </section>
+
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p4-s2">Constater l’échec attendu puis corriger avec venv et pip</h3>
+      <div class="section-body">
+        <p>Le script dépend du module <code>requests</code>. Sans installation locale, Python doit donc échouer au premier lancement. Ensuite, vous corrigerez proprement le problème à l’aide d’un environnement virtuel.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — premier lancement hors venv</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-fail" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-fail">
+        <div class="line" data-copy="python3 app.py" data-help-title="Provoquer l’erreur attendue" data-help="Le premier lancement doit être fait hors environnement virtuel pour vérifier que requests n’est pas encore installé localement." tabindex="0"><span class="line-no">1</span><span class="line-text">python3 app.py</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+Traceback (most recent call last):
+  ...
+ModuleNotFoundError: No module named &#x27;requests&#x27;</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p4-proof-fail">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez clairement l’erreur <strong>ModuleNotFoundError</strong> obtenue lors du premier lancement de <strong>app.py</strong> hors environnement virtuel.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — venv, dépendance et fichier requirements.txt</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-venv" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-venv">
+        <div class="line" data-copy="python3 -m venv venv" data-help-title="Créer l’environnement virtuel" data-help="Le dossier venv contiendra la copie locale de l’interpréteur et des dépendances." tabindex="0"><span class="line-no">1</span><span class="line-text">python3 -m venv venv</span></div><div class="line" data-copy="source venv/bin/activate" data-help-title="Activer l’environnement" data-help="Après activation, python et pip travaillent dans le projet au lieu du système." tabindex="0"><span class="line-no">2</span><span class="line-text">source venv/bin/activate</span></div><div class="line" data-copy="python -m pip install --upgrade pip"><span class="line-no">3</span><span class="line-text">python -m pip install --upgrade pip</span></div><div class="line" data-copy="python -m pip install requests"><span class="line-no">4</span><span class="line-text">python -m pip install requests</span></div><div class="line" data-copy="printf &quot;requests\n&quot; &gt; requirements.txt" data-help-title="Préparer les dépendances du futur conteneur" data-help="requirements.txt sera relu plus tard dans le Dockerfile." tabindex="0"><span class="line-no">5</span><span class="line-text">printf &quot;requests\n&quot; &gt; requirements.txt</span></div><div class="line" data-copy="cat requirements.txt"><span class="line-no">6</span><span class="line-text">cat requirements.txt</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — exécution locale réussie</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-success" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">(venv) etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-success">
+        <div class="line" data-copy="python app.py" data-help-title="Tester l’application" data-help="Le script doit maintenant s’exécuter sans erreur et afficher un verdict." tabindex="0"><span class="line-no">1</span><span class="line-text">python app.py</span></div><div class="line" data-copy="cat report.txt" data-help-title="Relire le rapport" data-help="Cette commande vérifie que report.txt a bien été créé sur la machine Ubuntu." tabindex="0"><span class="line-no">2</span><span class="line-text">cat report.txt</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+url: https://example.com
+status: 200
+temps_ms: 145.7
+verdict: OK
+rapport: report.txt
+
+date: 2026-...
+url: https://example.com
+status: 200
+temps_ms: 145.7
+verdict: OK</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p4-proof-success">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez l’exécution locale réussie de <strong>python app.py</strong> ainsi que le contenu de <strong>report.txt</strong>.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-5">
+  <div class="part-header"><h2 class="part-title">Partie 5 — Construire l’image Docker de l’application</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p5-s1">Écrire le Dockerfile correctement</h3>
+      <div class="section-body">
+        <p>Le Dockerfile décrit comment construire une image autonome. Ici, l’image doit contenir Python, la dépendance <code>requests</code> et votre script <code>app.py</code>.</p>
+        <div class="code-or-file">
+          <span class="file-label">Contenu à enregistrer dans <strong>Dockerfile</strong></span>
+          <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">Dockerfile</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="dockerfile-block" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      
+      <div class="code-content" id="dockerfile-block">
+        <div class="line" data-copy="FROM python:3.12-slim" data-help-title="Choisir une image de base" data-help="Le conteneur utilisera une image Python légère déjà prête à l’emploi." tabindex="0"><span class="line-no">1</span><span class="line-text">FROM python:3.12-slim</span></div><div class="line" data-copy="WORKDIR /app"><span class="line-no">2</span><span class="line-text">WORKDIR /app</span></div><div class="line" data-copy="COPY requirements.txt ." data-help-title="Copier les dépendances" data-help="On copie d’abord requirements.txt pour pouvoir installer les bibliothèques." tabindex="0"><span class="line-no">3</span><span class="line-text">COPY requirements.txt .</span></div><div class="line" data-copy="RUN pip install --no-cache-dir -r requirements.txt"><span class="line-no">4</span><span class="line-text">RUN pip install --no-cache-dir -r requirements.txt</span></div><div class="line" data-copy="COPY app.py ." data-help-title="Copier le code Python" data-help="Le script app.py est ajouté dans le conteneur après l’installation des dépendances." tabindex="0"><span class="line-no">5</span><span class="line-text">COPY app.py .</span></div><div class="line" data-copy="CMD [&quot;python&quot;, &quot;app.py&quot;]"><span class="line-no">6</span><span class="line-text">CMD [&quot;python&quot;, &quot;app.py&quot;]</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        </div>
+        <div class="callout spaced-block"><strong>Attention :</strong> la ligne <code>COPY requirements.txt .</code> a bien une destination, et la commande de construction utilisera obligatoirement un <strong>point final</strong> pour indiquer le contexte courant.</div>
+      </div>
+    </section>
+
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p5-s2">Construire puis exécuter le conteneur</h3>
+      <div class="section-body">
+        <p>Une fois l’image construite, vous devez vérifier que le comportement en conteneur est cohérent avec le comportement observé localement après installation de la dépendance.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — construire puis lancer l’image</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-build-run" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">(venv) etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-build-run">
+        <div class="line" data-copy="sudo docker build -t tp-python-requests ." data-help-title="Construire avec le contexte courant" data-help="Le point final est indispensable : il indique à Docker de prendre le contenu du dossier actuel comme contexte de construction." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker build -t tp-python-requests .</span></div><div class="line" data-copy="sudo docker run --rm tp-python-requests" data-help-title="Tester le lancement standard" data-help="Le conteneur exécute la commande CMD du Dockerfile." tabindex="0"><span class="line-no">2</span><span class="line-text">sudo docker run --rm tp-python-requests</span></div><div class="line" data-copy="sudo docker run --rm tp-python-requests python app.py --url https://example.com --timeout 5" data-help-title="Passer des paramètres au script" data-help="Cette commande remplace la partie finale de CMD et transmet une URL et un timeout explicites." tabindex="0"><span class="line-no">3</span><span class="line-text">sudo docker run --rm tp-python-requests python app.py --url https://example.com --timeout 5</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+[+] Building ...
+Successfully tagged tp-python-requests:latest
+url: https://example.com
+status: 200
+temps_ms: ...
+verdict: OK
+rapport: report.txt</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p5-proof-build">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez la construction de l’image <strong>tp-python-requests</strong> puis un lancement réussi du conteneur.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+        <div class="callout spaced-block">
+  <strong>À saisir :</strong> pourquoi la commande <code>docker build -t tp-python-requests .</code> doit-elle se terminer par un point ?
+  <div class="answer-area">
+    <textarea class="team-input answerbox-large" id="p5-answer" placeholder="Écris ici ta réponse..."></textarea>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-6">
+  <div class="part-header"><h2 class="part-title">Partie 6 — Récupérer le rapport sur la machine Ubuntu</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p6-s1">Utiliser un volume Docker pour sortir le fichier report.txt</h3>
+      <div class="section-body">
+        <p>Par défaut, un fichier créé dans le conteneur reste dans le conteneur. Avec un volume, vous pouvez faire apparaître le rapport directement sur la machine Ubuntu et le conserver même après la suppression du conteneur.</p>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — récupérer report.txt avec un volume</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-volume" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">(venv) etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-volume">
+        <div class="line" data-copy="mkdir -p reports"><span class="line-no">1</span><span class="line-text">mkdir -p reports</span></div><div class="line" data-copy="sudo docker run --rm -v &quot;$PWD/reports:/out&quot; tp-python-requests python app.py --url https://example.com --out /out/report.txt" data-help-title="Monter un volume" data-help="Le dossier local reports est partagé avec /out dans le conteneur pour récupérer le fichier généré." tabindex="0"><span class="line-no">2</span><span class="line-text">sudo docker run --rm -v &quot;$PWD/reports:/out&quot; tp-python-requests python app.py --url https://example.com --out /out/report.txt</span></div><div class="line" data-copy="ls -l reports"><span class="line-no">3</span><span class="line-text">ls -l reports</span></div><div class="line" data-copy="cat reports/report.txt" data-help-title="Contrôler le résultat" data-help="Cette commande confirme que le rapport a bien quitté le conteneur et existe maintenant sur la machine Ubuntu." tabindex="0"><span class="line-no">4</span><span class="line-text">cat reports/report.txt</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="resultblock">
+  <div aria-label="Affichage sur écran" class="pcframe screen-m">
+    <div class="pcinner">
+      <pre class="shell resultpre">Exemple de résultat attendu
+report.txt
+date: 2026-...
+url: https://example.com
+status: 200
+temps_ms: ...
+verdict: OK</pre>
+    </div>
+  </div>
+</div>
+        <div class="proof callout spaced-block" data-proof-id="p6-proof-volume">
+  <div class="proof-head">
+    <div><strong>Capture obligatoire :</strong> montrez que le fichier <strong>reports/report.txt</strong> existe sur la machine Ubuntu après le lancement du conteneur avec le volume.</div>
+  </div>
+  <div class="proof-body" tabindex="0" title="Cliquez ici puis collez une image depuis le presse-papiers avec Ctrl+V">
+    <div class="proofEmpty">
+      <button class="btnCapture proofInsertLink" type="button">Insérer</button>
+      ici la capture demandée.
+      <div class="proofPasteHint">ou collez une image enregistrée dans le presse-papiers avec Ctrl+V.</div>
+    </div>
+    <img alt="Capture de l’étudiant" class="proofImg"/>
+    <input accept="image/*" class="proofFile" hidden="" type="file"/>
+    <div class="proofBodyActions"><button class="btnClear proofRemoveLink" type="button">retirer la capture</button></div>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="part" id="partie-7">
+  <div class="part-header"><h2 class="part-title">Partie 7 — Bilan final et nettoyage</h2></div>
+  <div class="part-body">
+    <section class="section-block line-section">
+      <h3 class="section-title" id="p7-s1">Vérifier l’ensemble du travail réalisé</h3>
+      <div class="section-body">
+        <p>Avant l’export en PDF, vérifiez que vous avez réellement couvert les compétences du labo : lancer un conteneur, interagir avec lui, observer son cycle de vie, inspecter son état, construire une image et récupérer un fichier généré par un conteneur.</p>
+        <div class="table-wrap">
+          <table class="capture-checklist-table">
+            <thead>
+              <tr>
+                <th>Capture obligatoire</th>
+                <th>Ce que la capture doit montrer</th>
+                <th>Insérée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pré requis</td>
+                <td>Versions Python et Docker, plus <code>docker ps</code> sans erreur bloquante.</td>
+                <td class="check-cell"><input aria-label="Pré requis" class="capture-check" data-proof-target="p1-proof" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Lancement de Nginx</td>
+                <td>Le conteneur <code>web1</code> actif et une vérification du service HTTP.</td>
+                <td class="check-cell"><input aria-label="Lancement de Nginx" class="capture-check" data-proof-target="p2-proof-run" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Interaction avec le conteneur</td>
+                <td>Une commande <code>docker exec</code> et une trace utile de <code>docker logs</code> ou du fichier temporaire.</td>
+                <td class="check-cell"><input aria-label="Interaction avec le conteneur" class="capture-check" data-proof-target="p2-proof-interact" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Inspection et monitoring</td>
+                <td>Des sorties de <code>docker inspect</code>, <code>docker stats</code> et <code>docker diff</code>.</td>
+                <td class="check-cell"><input aria-label="Inspection et monitoring" class="capture-check" data-proof-target="p3-proof" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Échec attendu</td>
+                <td>L’erreur <code>ModuleNotFoundError</code> avant l’installation de <code>requests</code>.</td>
+                <td class="check-cell"><input aria-label="Échec attendu" class="capture-check" data-proof-target="p4-proof-fail" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Exécution locale corrigée</td>
+                <td>Le lancement réussi de <code>python app.py</code> et le contenu de <code>report.txt</code>.</td>
+                <td class="check-cell"><input aria-label="Exécution locale corrigée" class="capture-check" data-proof-target="p4-proof-success" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Image Docker de l’application</td>
+                <td>La construction de l’image puis le lancement réussi du conteneur Python.</td>
+                <td class="check-cell"><input aria-label="Image Docker de l’application" class="capture-check" data-proof-target="p5-proof-build" type="checkbox"/></td>
+              </tr>
+              <tr>
+                <td>Volume et rapport récupéré</td>
+                <td>Le fichier <code>reports/report.txt</code> visible sur la machine Ubuntu.</td>
+                <td class="check-cell"><input aria-label="Volume et rapport récupéré" class="capture-check" data-proof-target="p6-proof-volume" type="checkbox"/></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <section class="snippet-embed">
+  <section class="code-window theme-linux">
+    <div class="window-header">
+      <div class="window-controls"><span></span><span></span><span></span></div>
+      <div class="window-title">terminal — nettoyage final</div>
+      <button class="copy-btn" data-copy-mode="plain" data-copy-target="linux-cleanup" type="button">Copier</button>
+    </div>
+    <div class="code-body">
+      <div class="terminal-intro">(venv) etudiant@ubuntu:~/docker-labo-healthcheck$</div>
+      <div class="code-content" id="linux-cleanup">
+        <div class="line" data-copy="sudo docker rm -f web1" data-help-title="Supprimer le conteneur Nginx" data-help="Le conteneur d’essai n’est plus nécessaire à la fin du labo." tabindex="0"><span class="line-no">1</span><span class="line-text">sudo docker rm -f web1</span></div><div class="line" data-copy="sudo docker image ls"><span class="line-no">2</span><span class="line-text">sudo docker image ls</span></div><div class="line" data-copy="deactivate" data-help-title="Quitter le venv" data-help="Cette commande ferme l’environnement virtuel local." tabindex="0"><span class="line-no">3</span><span class="line-text">deactivate</span></div>
+      </div>
+    </div>
+  </section>
+</section>
+        <div class="callout spaced-block">
+  <strong>À saisir :</strong> résumez en quelques lignes la différence entre l’exécution locale avec venv et l’exécution dans un conteneur Docker.
+  <div class="answer-area">
+    <textarea class="team-input answerbox-large" id="p7-answer" placeholder="Écris ici ta réponse..."></textarea>
+  </div>
+</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="part" id="partie-qcm">
+<div class="part-header"><h2 class="part-title">QCM de validation</h2></div>
+<div class="part-body">
+<div class="callout spaced-block qcm-intro"><strong>Consigne :</strong> cochez la bonne réponse pour chaque question. Une seule réponse est correcte par question.</div>
+<section class="section-block qcm-block" data-correct="B">
+  <h3 class="section-title"><span class="qcm-badge">Question 1</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Quelle commande permet d’exécuter une commande ponctuelle à l’intérieur d’un conteneur déjà lancé ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q1" type="radio" value="A"/><span class="qcm-option-text">docker build</span></label>
+<label class="qcm-option"><input name="qcm_q1" type="radio" value="B"/><span class="qcm-option-text">docker exec</span></label>
+<label class="qcm-option"><input name="qcm_q1" type="radio" value="C"/><span class="qcm-option-text">docker image ls</span></label>
+<label class="qcm-option"><input name="qcm_q1" type="radio" value="D"/><span class="qcm-option-text">docker cp</span></label>
+    </div>
+  </div>
+</section>
+<section class="section-block qcm-block" data-correct="C">
+  <h3 class="section-title"><span class="qcm-badge">Question 2</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Quelle commande affiche un instantané d’utilisation CPU et mémoire d’un conteneur ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q2" type="radio" value="A"/><span class="qcm-option-text">docker logs</span></label>
+<label class="qcm-option"><input name="qcm_q2" type="radio" value="B"/><span class="qcm-option-text">docker inspect</span></label>
+<label class="qcm-option"><input name="qcm_q2" type="radio" value="C"/><span class="qcm-option-text">docker stats --no-stream</span></label>
+<label class="qcm-option"><input name="qcm_q2" type="radio" value="D"/><span class="qcm-option-text">docker pull</span></label>
+    </div>
+  </div>
+</section>
+<section class="section-block qcm-block" data-correct="A">
+  <h3 class="section-title"><span class="qcm-badge">Question 3</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Pourquoi le premier lancement de app.py doit-il échouer hors venv dans ce labo ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q3" type="radio" value="A"/><span class="qcm-option-text">Pour vérifier que la dépendance requests n’est pas encore installée localement</span></label>
+<label class="qcm-option"><input name="qcm_q3" type="radio" value="B"/><span class="qcm-option-text">Pour tester le port 8080</span></label>
+<label class="qcm-option"><input name="qcm_q3" type="radio" value="C"/><span class="qcm-option-text">Pour supprimer automatiquement le conteneur</span></label>
+<label class="qcm-option"><input name="qcm_q3" type="radio" value="D"/><span class="qcm-option-text">Pour construire le Dockerfile</span></label>
+    </div>
+  </div>
+</section>
+<section class="section-block qcm-block" data-correct="D">
+  <h3 class="section-title"><span class="qcm-badge">Question 4</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Dans la commande docker build -t tp-python-requests . , que représente le point final ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q4" type="radio" value="A"/><span class="qcm-option-text">Le nom du conteneur</span></label>
+<label class="qcm-option"><input name="qcm_q4" type="radio" value="B"/><span class="qcm-option-text">Le port publié</span></label>
+<label class="qcm-option"><input name="qcm_q4" type="radio" value="C"/><span class="qcm-option-text">Le nom de l’image</span></label>
+<label class="qcm-option"><input name="qcm_q4" type="radio" value="D"/><span class="qcm-option-text">Le contexte de construction courant</span></label>
+    </div>
+  </div>
+</section>
+<section class="section-block qcm-block" data-correct="A">
+  <h3 class="section-title"><span class="qcm-badge">Question 5</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Quel mécanisme permet de récupérer report.txt sur la machine Ubuntu après l’exécution du conteneur ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q5" type="radio" value="A"/><span class="qcm-option-text">Le montage d’un volume</span></label>
+<label class="qcm-option"><input name="qcm_q5" type="radio" value="B"/><span class="qcm-option-text">docker pause</span></label>
+<label class="qcm-option"><input name="qcm_q5" type="radio" value="C"/><span class="qcm-option-text">docker diff</span></label>
+<label class="qcm-option"><input name="qcm_q5" type="radio" value="D"/><span class="qcm-option-text">docker restart</span></label>
+    </div>
+  </div>
+</section>
+<section class="section-block qcm-block" data-correct="B">
+  <h3 class="section-title"><span class="qcm-badge">Question 6</span></h3>
+  <div class="section-body">
+    <p class="qcm-question">Quelle commande montre les changements internes réalisés dans le conteneur depuis son démarrage ?</p>
+    <div class="qcm-options">
+      <label class="qcm-option"><input name="qcm_q6" type="radio" value="A"/><span class="qcm-option-text">docker port</span></label>
+<label class="qcm-option"><input name="qcm_q6" type="radio" value="B"/><span class="qcm-option-text">docker diff</span></label>
+<label class="qcm-option"><input name="qcm_q6" type="radio" value="C"/><span class="qcm-option-text">docker stop</span></label>
+<label class="qcm-option"><input name="qcm_q6" type="radio" value="D"/><span class="qcm-option-text">docker ps -a</span></label>
+    </div>
+  </div>
+</section>
+</div>
+</section>
+
+<section class="card" id="export">
+<h2>Exporter en PDF</h2>
+<ul class="list">
+<li>Vérifiez que toutes les captures obligatoires sont visibles dans la page.</li>
+<li>Vérifiez que vos réponses rédigées sont complètes et lisibles.</li>
+<li>Cliquez sur <strong>Exporter en PDF</strong>, puis choisissez <strong>Enregistrer en PDF</strong>.</li>
+<li>Remettez ensuite le fichier PDF selon la consigne donnée.</li>
+</ul>
+<div aria-label="Export" class="exportbar exportbar-spaced render-export">
+<button class="actionbtn" id="exportPdf" type="button">Exporter en PDF</button>
+</div>
+<div class="callout spaced-block export-callout">
+<strong>Important :</strong> si une capture, une réponse ou une information n’apparaît pas dans la page avant l’export, elle ne sera pas dans le PDF.
+</div>
+</section>
+
+<footer class="course-footer">
+<div class="course-footer-left">Version 2026</div>
+<div class="course-footer-right">© <a class="footer-author-link" href="droits.html">Anis Ghaieb</a> — Support pédagogique original — Tous droits réservés</div>
+</footer>
+
+<div aria-hidden="true" class="export-confirm-overlay" hidden="" id="exportConfirmOverlay">
+<div aria-labelledby="exportConfirmTitle" aria-modal="true" class="export-confirm-dialog" role="dialog">
+<h2 class="export-confirm-title" id="exportConfirmTitle">Captures obligatoires manquantes</h2>
+<p class="export-confirm-text" id="exportConfirmMessage"></p>
+<div class="export-confirm-actions">
+<button class="actionbtn" id="exportCancel" type="button">Retourner au labo</button>
+<button class="actionbtn primary" id="exportContinue" type="button">Poursuivre l’export</button>
+</div>
+</div>
+</div>
+<div class="code-help-tooltip" hidden="" id="codeHelpTooltip"></div>
+</main>
+</body>
+</html>
